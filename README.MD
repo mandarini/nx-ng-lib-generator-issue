@@ -1,6 +1,8 @@
 # Angular lib generator issue with directory + Lerna
 
-Using `libs/*` as directory when generating an Angular library does not work with a specific Lerna config.
+Using as directory the directory specified in `packages` property in `lerna.json` when generating an Angular library does not work.
+
+Example, in `lerna.json` you have `"packages": ["libs/*"],`, then `--directory=libs/<ANYTHING>` does not work.
 
 Error starts happening on Nx 17. Same lerna config works with Nx 16.10.
 
