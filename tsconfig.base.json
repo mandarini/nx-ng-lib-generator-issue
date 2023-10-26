@@ -1,0 +1,57 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "declarationMap": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es2020",
+    "module": "es2020",
+    "lib": [
+      "es2022",
+      "dom",
+      "ESNext.Intl"
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "strictBindCallApply": false,
+    "strictNullChecks": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "pretty": true,
+    "paths": {}
+  },
+  "angularCompilerOptions": {
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true,
+    "strictNullInputTypes": false,
+    "strictInputTypes": false,
+    "strictAttributeTypes": false,
+    "fullTemplateTypeCheck": true,
+    "trace": false
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
+}

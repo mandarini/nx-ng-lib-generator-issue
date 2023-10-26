@@ -1,0 +1,23 @@
+.favorites-icons {
+  display: inline-block;
+}
+.layout-menu ul a {
+  padding: 0.2rem;
+}
+
+li.favorites-icons:empty {
+  display: none !important;
+}
+
+li.hidden-menu {
+  display: none !important;
+}
+
+li.hidden-menu + li.menu-separator {
+  display: none !important;
+}
+
+/* :host::ng-deep li.layout-root-menuitem ul[role='menu']:empty {
+  display: none !important;
+}
+ */

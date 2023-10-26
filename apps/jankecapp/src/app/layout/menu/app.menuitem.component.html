@@ -1,0 +1,99 @@
+<ng-container>
+  <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label | translate }}</div>
+  <a
+    *ngIf="(!item.routerLink || item.items) && item.visible !== false"
+    pRipple
+    [attr.href]="item.url"
+    [ngClass]="item.class"
+    [attr.target]="item.target"
+    [attr.tabindex]="0"
+    (click)="itemClick($event)"
+    (mouseenter)="onMouseEnter()"
+    (keydown.enter)="itemClick($event)"
+  >
+    <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
+    <span class="layout-menuitem-text">{{ item.label | translate }}</span>
+    <i
+      *ngIf="item.items"
+      class="pi pi-fw layout-submenu-toggler"
+      [ngClass]="!appMain.isHorizontal() ? 'pi-chevron-down' : 'pi-angle-down'"
+    ></i>
+  </a>
+  <a
+    *ngIf="item.routerLink && !item.items && item.visible !== false"
+    pRipple
+    routerLinkActive="active-route"
+    ariaCurrentWhenActive="page"
+    [routerLink]="item.routerLink"
+    [ngClass]="item.class"
+    [routerLinkActiveOptions]="{
+      paths: 'exact',
+      queryParams: 'exact',
+      matrixParams: 'ignored',
+      fragment: 'ignored'
+    }"
+    [attr.target]="item.target"
+    [attr.tabindex]="0"
+    (click)="itemClick($event)"
+    (mouseenter)="onMouseEnter()"
+  >
+    <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
+    <span class="layout-menuitem-text">{{ item.label | translate }}</span>
+    <i
+      *ngIf="item.items"
+      class="pi pi-fw layout-submenu-toggler"
+      [ngClass]="!appMain.isHorizontal() ? 'pi-chevron-down' : 'pi-angle-down'"
+    ></i>
+  </a>
+
+  <ul
+    *ngIf="item.items && item.visible !== false"
+    role="list"
+    [@children]="
+      appMain.isSlim() || appMain.isHorizontal()
+        ? root
+          ? appMain.isMobile()
+            ? 'visible'
+            : slimClick && !appMain.isHorizontal()
+            ? active
+              ? 'slimVisibleAnimated'
+              : 'slimHiddenAnimated'
+            : active
+            ? 'visible'
+            : 'hidden'
+          : appMain.isSlim() || appMain.isHorizontal()
+          ? active
+            ? 'visibleAnimated'
+            : 'hiddenAnimated'
+          : active
+          ? 'visible'
+          : 'hidden'
+        : root
+        ? 'visible'
+        : active
+        ? 'visibleAnimated'
+        : 'hiddenAnimated'
+    "
+  >
+    <ng-template ngFor let-child let-i="index" [ngForOf]="item.items">
+      <ng-container
+        *hasPermissions="
+          item.items[i]?.permissions?.requiredPermissions;
+          operation: item.items[i]?.permissions?.operation;
+          moduleAlias: item.items[i]?.moduleAlias
+        "
+      >
+        <li
+          role="listitem"
+          app-menuitem
+          [item]="child"
+          [index]="i"
+          [parentKey]="key"
+          [class]="child.badgeClass"
+          [root]="false"
+          [id]="child.id"
+        ></li>
+      </ng-container>
+    </ng-template>
+  </ul>
+</ng-container>

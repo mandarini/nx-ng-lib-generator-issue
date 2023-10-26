@@ -1,0 +1,1083 @@
+<div class="card">
+  <h2>Documentation - FIYU 1.0.4</h2>
+  <h4>Getting Started</h4>
+  <p>
+    FIYU platform is a set of functional modules, applications, libraries, conventions and procedures which help
+    software developers and managers to build high-quality software in a short amount of time, which of course means
+    significant cost reduction for software product implementation, delivery and deployment.
+  </p>
+  <p>Current version is Angular v16 with PrimeNG v16.</p>
+  <p>
+    Also, we use Nx (v16), fast and extensible build system with first class monorepo support and powerful integrations.
+  </p>
+  <h4>How to create a module?</h4>
+  <p>
+    If you want to create a new module, the first step is to create a new lib using Nx.<br />
+    You might use the
+    <strong>--publishable</strong>
+    option when generating a new Nx library if your intention is to distribute it outside the monorepo (publishing to
+    NPM registry).
+  </p>
+  <p>
+    The <strong>--importPath</strong> flag allows us to define the name and scope of the NPM package.<br />
+    Defining <strong>--standalone</strong> flag will generate a library that uses a standalone component instead of a
+    module as the entry point.<br />
+    Use the generator to scaffold a new library via command:
+  </p>
+  <pre>
+        <code class="language-powershell" fiyuPCode  ngNonBindable ngPreserveWhitespaces>
+            npx nx g @nx/angular:lib mylib --publishable --buildable --standalone --importPath @myorg/mylib
+        </code>
+    </pre>
+
+  <h4>How to configure module?</h4>
+
+  <p>
+    In <strong>package.json</strong> file located in the newly created module, add
+    <strong>publishConfig</strong> section as in the example below.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            "publishConfig":  &#123;
+                "directory": "../../dist/libs/documentation",
+                "registry": "https://gitlab.fiyu.online/api/v4/projects/36/packages/npm/"
+             &#125;
+        </code>
+    </pre>
+
+  <p>
+    It's also good to add <strong>compilerOptions</strong> in <strong>tsconfig.json</strong> file located in the newly
+    created module, like in the example below.
+  </p>
+
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+             "compilerOptions": &#123;
+                "forceConsistentCasingInFileNames": true,
+                "strict": true,
+                "noImplicitReturns": true,
+                "importHelpers": true,
+                "noFallthroughCasesInSwitch": true,
+                "target": "es2020"
+              &#125;,
+              "angularCompilerOptions": &#123;
+                "strictInjectionParameters": true,
+                "strictInputAccessModifiers": true,
+                "strictTemplates": true
+              &#125;
+        </code>
+    </pre>
+
+  <h4>Metadata</h4>
+  <p>
+    Create <strong>metadata.module.ts</strong> file, this class <strong>ModuleMetadata</strong> must extend
+    <strong>AbstractModuleMetadata</strong> and implement <strong>ModuleMetadataInterface</strong>.
+  </p>
+
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+          export class ModuleMetadata extends AbstractModuleMetadata implements ModuleMetadataInterface &#123;
+            public isCore = false;                         // Is module local module only, server doesn't know about it
+
+            public isAdmin = false;
+
+            public moduleName = 'Crm';                     // Module name
+
+            public moduleIcon = 'pi pi-fw pi-book';        // Module Icon
+
+            public moduleNameShort = 'CRM';                //  Short name
+
+            public moduleDescription = 'CRM Module ';      // Module description
+
+            public modulePermissions = ModulePermissions;  // All possible permissions for this module
+
+            public modulePrefix = 'crm';                   // Module prefix used in navigation and url
+
+            public moduleLogoClass = 'pi pi-fw pi-book';   // Module prefix used in navigation and url
+
+            public moduleLogoColor = '#3c3c3c';            // Module prefix used in navigation and url
+
+            public moduleLogoDarkerColor = '#000';         // Module darker color
+
+            public moduleAlias = 'CRM';                    // Module name used for accessing user module permissions
+
+            private planPermissions: Permissions                   // Sidebar permissions
+
+            public menuItems: FiyuMenuItem[] = [];         // Module sidebar navigation
+          &#125;
+        </code>
+    </pre>
+
+  <h4>Permissions</h4>
+
+  <p>
+    Create <strong>module-permission.ts</strong> for example like that, in enum <strong>ModulePermissions</strong> add
+    all permissions and prefixes.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            export enum ModulePermissions &#123;
+                USER_VIEW = 'USER_VIEW',    // Add all permissions that exist for this module
+
+                // Permission prefixes
+                USER = 'USER',              // Add all prefixes that exist for this module
+
+            &#125;
+        </code>
+    </pre>
+  <h4>Validation code</h4>
+  <p>
+    We have global validation errors (shared between all modules) and validation errors specific to the module itself.
+  </p>
+  <p>
+    Global validation errors are defined in <strong>@fiyu/core</strong> lib in the
+    <strong>validation-errors.ts</strong> file.&nbsp; For creating module validation errors specific to the module
+    itself, enter all validation errors in the <strong>module-validation-error.ts</strong> file like provided below in
+    the snippet.
+  </p>
+
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            import &#123; sharedValidationErrors, ValidationError &#125; from '@fiyu/core';
+
+            export const validationErrors: ValidationError[] = [
+                ...sharedValidationErrors,
+                &#123;
+                    error: &#123;
+
+                        key: 'FIYU_USER_NOT_FOUND',                     // The key we get from the BE side
+                    &#125;,
+                        message: 'User not found with given email.',    // The message we display to the user
+                &#125;
+            ]
+        </code>
+    </pre>
+  <h4>Providers and injection tokens</h4>
+  <p>
+    Since in standalone pattern we don't have a module we have to create a <strong>module-providers.ts</strong> file,
+    add all providers there and provide them in <strong>app.config.ts</strong> file which is being used in the method
+    <strong>bootstrapApplication</strong> of <strong>main.ts</strong> file. Injection tokens will be provided via route
+    providers as shown later on.
+  </p>
+  <pre>
+    <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      // change Libname with your previously created lib name
+      import &#123; EnvironmentProviders, makeEnvironmentProviders &#125; from '@angular/core';
+      import &#123; LibnameModuleMetadataService &#125; from './libname-module-metadata.service';
+
+      export function provideLibnameModuleProviders(): EnvironmentProviders &#123;
+        return makeEnvironmentProviders([
+          &#123;
+            provide: 'LibnameModuleMetadataService',
+            useClass: LibnameModuleMetadataService,
+          &#125;
+        ]);
+      &#125;
+    </code>
+  </pre>
+  <pre>
+    <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      // change Libname and myorg with your previously created lib and organization name
+      import &#123; provideLibnameModuleProviders &#125; from '@myorg/libname';
+
+      export const appConfig: ApplicationConfig = &#123;
+        providers: [
+        ...
+        provideLibnameModuleProviders(),
+        ...
+        ],
+      &#125;;
+    </code>
+  </pre>
+
+  <h4>Routing</h4>
+  <p>
+    Since in standalone pattern we don't have a module and routing module anymore we have to create a
+    <strong>&#60;libname&#62;.routes.ts</strong> file, add all child routes there and link them in
+    <strong>app.routes.ts</strong> file which is being used in the method <strong>bootstrapApplication</strong> of
+    <strong>main.ts</strong> file via <strong>app.config.ts</strong> file:
+  </p>
+  <pre>
+    <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      // change newfeature with your previously created feture name
+      import &#123; MODULE_METADATA_TOKEN, VALIDATION_ERRORS_TOKEN &#125; from '@fiyu/api';
+      import &#123; FiyuRoutes, PermissionsMatchGuard &#125; from '@fiyu/core';
+      import &#123; ModuleMetadata &#125; from './module-metadata';
+      import &#123; ModulePermissions &#125; from './module-permissions';
+      import &#123; validationErrors &#125; from './module-validation-errors';
+
+      export const NewFeatureRoutes: FiyuRoutes = [
+        &#123;
+          path: '',
+          title: 'NewFeature',
+          loadComponent: () => import('./newfeature-layout/newfeature-layout.component').then((c) => c.NewFeatureLayoutComponent),
+          // here we provide providers (injection tokens in this case) for all the child routes
+          providers: [
+            &#123; provide: VALIDATION_ERRORS_TOKEN, useValue: &#123; validationErrors &#125; &#125;,
+            &#123; provide: MODULE_METADATA_TOKEN, useValue: ModuleMetadata.getInstance() &#125;,
+          ],
+          children: [
+            &#123;
+              path: 'newfeature-list',
+              loadComponent: () => import('./newfeature/newfeature-list/newfeature-list.component').then((c) => c.NewFeatureListComponent),
+              canMatch: [PermissionsMatchGuard],
+              requiredModule: 'newfeature', // module prefix, defined in module-metadata.ts file
+              requiredPermissions: [ModulePermissions.NEWFEATURE_VIEW], // defined in module-permissions.ts file
+            &#125;,
+            &#123;
+              path: 'newfeature/:id/edit',
+              loadComponent: () => import('./newfeature/newfeature-form/newfeature-form.component').then((c) => c.NewFeatureFormComponent),
+              canMatch: [PermissionsMatchGuard],
+              requiredModule: 'newfeature', // module prefix, defined in module-metadata.ts file
+              requiredPermissions: [ModulePermissions.NEWFEATURE_RUN, ModulePermissions.NEWFEATURE_EDIT], // defined in module-permissions.ts file
+            &#125;,
+            &#123;
+              path: 'newfeature',
+              loadComponent: () => import('./newfeature/newfeature-form/newfeature-form.component').then((c) => c.NewFeatureFormComponent),
+              canMatch: [PermissionsMatchGuard],
+              requiredModule: 'newfeature', // module prefix, defined in module-metadata.ts file
+              requiredPermissions: [ModulePermissions.NEWFEATURE_RUN, ModulePermissions.NEWFEATURE_CREATE], // defined in module-permissions.ts file
+            &#125;,
+            &#123;
+              path: 'landing',
+              loadComponent: () => import('./newfeature-landing/newfeature-landing.component').then((c) => c.NewFeatureLandingComponent),
+              canMatch: [PermissionsMatchGuard],
+              requiredModule: 'newfeature', // module prefix, defined in module-metadata.ts file
+              requiredPermissions: [ModulePermissions.NEWFEATURE_RUN],
+            &#125;,
+            &#123;
+              path: '',
+              redirectTo: 'landing',
+              pathMatch: 'full',
+            &#125;,
+          ],
+        &#125;,
+      ];
+    </code>
+  </pre>
+
+  <h4>Translation</h4>
+  <p>
+    We have global translations to avoid duplicate translations throughout app (username, password, email, etc).<br />
+    In this case we use enum <strong>SharedTranslateKeys</strong> that is located in <strong>@fiyu/api</strong> lib in
+    <strong>translate-keys.enum.ts</strong> file. When adding new strings for translation we should do:
+  </p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      import &#123; marker as _ &#125; from '@biesbjerg/ngx-translate-extract-marker';
+
+      _('common.username');                       // Create translation keys
+      ...
+
+      // connect translate key with enum for easier usage in code
+      export enum SharedTranslateKeys &#123;
+          ...
+          Username = 'common.username',
+          ...
+      &#125;
+  </code>
+</pre>
+
+  <p>
+    For the strings specific to the module itself, that need to be translated, create a new file
+    <strong>module-translate-keys.ts</strong>, create keys as in the example below.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            import &#123; marker as _ &#125; from '@biesbjerg/ngx-translate-extract-marker';
+
+            _('common.plan');                       // Create translation keys
+            ...
+
+            // connect translate key with enum for easier usage in code
+            export enum TranslateKeys &#123;
+                Plan = 'common.plan',
+            &#125;
+        </code>
+    </pre>
+
+  <p>After that you need to execute script to add newly added translate keys in translation json files</p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            npm run i18n:extract    // if file exist
+            npm run i18n:init       // if file not exist
+        </code>
+    </pre>
+
+  <p>As a last step you need to add translations in en.json and other files (de.json, hr.json etc...)</p>
+
+  <h4>Navigation</h4>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/fiyu-side-navigation.png"
+    width="266"
+    height="659"
+    priority
+    alt="Image"
+  />
+  <p>
+    When you want to display your module in the side menu, first go to file
+    <strong>\src\app\workspace\module-metadata.ts</strong>
+    and add your module details in <strong>menuItems</strong> array as in the example below.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            public menuItems = [
+              &#123;
+                label: 'Business modules',
+                icon: 'pi pi-fw pi-th-large',
+                items: [
+                  &#123;
+                    label: 'Lib Label',                      // Module label
+                    icon: 'pi pi-fw pi-cog',                // Module Icon
+                    routerLink: '/libname',                // link
+                    permissions: this.libPermissions,  // which users can see that module
+                    moduleAlias: 'LIBALIAS',                // module alias that we defined in module metadata
+                  &#125;
+                ]
+              &#125;
+            ]
+        </code>
+  </pre>
+  <h4>How to add feature into module?</h4>
+  <p>
+    For each new feature, first create a new folder, after that create model, service, and components that you need.
+  </p>
+  <h4>Models</h4>
+  <p>
+    First create a new file <strong>newfeature.model.ts</strong> and then create a class for example called
+    <strong>NewFeature</strong> which will <strong>extend AbstractEntity</strong>, define
+    <strong>@Entity</strong> decorator and use <strong>@FormEntity</strong> decorator options for model (DTO)
+    properties, as in the example below. This model will be used for creating form component.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            @Entity(&#123;
+                singularName: TranslateKeys.Plan,         // Singular name of entity, used as label in some use cases
+                pluralName: TranslateKeys.Plans,          // Plural name of entity, used as label in some use cases
+                singularUrlName: 'plan',                  // Entity singular name of url, used for default navigation and convention
+                pluralUrlName: 'plans',                   // Entity plural name of url, used for default navigation and convention
+                contentType: 'application/plan.v1+json',  // Content type used for DTO versioning
+                permissionPrefix: ModulePermissions.USER, // Permission prefix for entity
+                quickExportEnabled: true,                 // Quick export enabled or disabled
+            &#125;)
+            export class NewFeature extends AbstractEntity &#123;
+
+              @FormEntity(&#123;
+                formType: FormControlType.InputText,
+                label: SharedTranslateKeys.Name,
+                required: true,
+              &#125;)
+              name: string;
+
+              @FormEntity(&#123;
+                formType: FormControlType.Dropdown,
+                label: SharedTranslateKeys.PlanType,
+                required: true,
+                lookupEmpty: false,
+                // in case enum is used for dropdown options
+                lookupOptions: EnumUtility.mapEnumToSelectItems(PlanTypeEnum),
+                // in case lookup service is used for dropdown options
+                lookupModel: Plan,
+                lookupService: PlanService,
+              &#125;)
+              planType: string;
+
+              @FormEntity(&#123;
+                formType: FormControlType.InputNumber,
+                label: SharedTranslateKeys.Price,
+                required: true,
+                fieldOptions: &#123;
+                  minFractionDigits: 2,
+                &#125;,
+              &#125;)
+              price: number;
+
+              @FormEntity(&#123;
+                formType: FormControlType.Date,
+                label: SharedTranslateKeys.StartDate,
+                validators: &#123;
+                  dateLessThan: 'expirationDate',
+                  required: true,
+                &#125;,
+              &#125;)
+              startDate: Date;
+
+              @FormEntity(&#123;
+                formType: FormControlType.Date,
+                label: SharedTranslateKeys.ExpirationDate,
+                validators: &#123;
+                  dateGreaterThan: 'startDate',
+                  required: true,
+                &#125;,
+              &#125;)
+              expirationDate: Date;
+
+              @FormEntity(&#123;
+                formType: FormControlType.TextArea,
+                label: SharedTranslateKeys.Description,
+                validators: &#123;
+                  maxLength: 100,
+                &#125;,
+              &#125;)
+              description: string;
+            &#125;
+        </code>
+    </pre>
+
+  <p>
+    First create a new file <strong>newfeature-list-item.model.ts</strong> and then create a class for example called
+    <strong>NewFeatureListItem</strong> which will <strong>extend AbstractEntity</strong>, define
+    <strong>@Entity</strong> decorator and use <strong>@PresentationEntity</strong> decorator options for model (DTO)
+    properties, as in the example below. This model will be used for creating table component.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            @Entity(&#123;
+                singularName: TranslateKeys.Plan,         // Singular name of entity, used as label in some use cases
+                pluralName: TranslateKeys.Plans,          // Plural name of entity, used as label in some use cases
+                singularUrlName: 'plan',                  // Entity singular name of url, used for default navigation and convention
+                pluralUrlName: 'plans',                   // Entity plural name of url, used for default navigation and convention
+                contentType: 'application/plan.list.item.v1+json',  // Content type used for DTO versioning
+                permissionPrefix: ModulePermissions.USER, // Permission prefix for entity
+                labelField: 'name',                       // field used for sorting and filtering (default is name if not defined)
+                defaultSort: &#123; field: 'name', order: SortDirection.Ascending, type: 'string' &#125;, // setting default sort configuration
+                quickExportEnabled: true,                 // Quick export enabled or disabled
+            &#125;)
+            export class NewFeatureListItem extends AbstractEntity &#123;
+
+              @PresentationEntity(&#123;
+                displayName: SharedTranslateKeys.Name,
+              &#125;)
+              name: string;
+
+              @PresentationEntity(&#123;
+                displayName: SharedTranslateKeys.PlanType,
+                // in case enum is used for dropdown options
+                enumModel: PlanTypeEnum,
+                // in case lookup service is used for dropdown options
+                lookupModel: Plan,
+                lookupService: PlanService,
+              &#125;)
+              planType: string;
+
+              @PresentationEntity(&#123;
+                displayName: SharedTranslateKeys.Price,
+                disableSort: true,
+                disableFilter: true,
+              &#125;)
+              price: number;
+
+              @PresentationEntity(&#123;
+                displayName: SharedTranslateKeys.Description,
+                disableSort: true,
+                tableDisplay: false,
+              &#125;)
+              description: string;
+
+              @PresentationEntity(&#123;
+                displayName: SharedTranslateKeys.StartDate,
+              &#125;)
+              startDate: Date;
+
+              @PresentationEntity(&#123;
+                displayName: TranslateKeys.ExpirationDate,
+              &#125;)
+              expirationDate: Date;
+        &#125;
+        </code>
+    </pre>
+
+  <h5>All properties of @FormEntity decorator</h5>
+  <pre>
+    <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      formType: string,                    // Type of form control, possible options are: 'input', 'number', 'textarea', 'input-switch', 'input-mask', 'currency', 'password', 'rating', 'checkbox', 'radio-button-group', dropdown', 'dropdown-filter', 'autocomplete', 'multi-select', 'date', 'date-time', 'time', 'multiple-date', 'file', 'upload', 'select-button' (default is 'input' if not defined and can be omitted)
+      label: string,                       // Label for field (form control), default is property name if not defined
+      renderLabel: boolean,                // Should label on field be rendered (displayed), default is true and can be omitted
+      arrayValueType: 'type',              // What type are items in array, if entity type is array
+      hidden: boolean,                     // Is this field hidden, rendered but not visible in form (default is false)
+      readonly: boolean,                   // Is this field readonly input field
+      disabled: boolean,                   // Is this field disabled
+      required: boolean,                   // Is this field required
+      groupNumber: number,                 // Where this property should be displayed, in which form group (box), default is 1, used if form is divided in multiple sections
+      initialValue: number,                // Initial value for form control
+      placeholder: 'placeholder',          // Placeholder for form control
+      render: boolean,                     // Should this field be rendered (displayed), default is true and can be omitted
+      validators: Object,                  // validators for form control. Possible validators are: 'required', 'email', 'min', 'max', 'dateGreaterThan', 'dateLessThan', 'minLength', 'maxLength', 'password', 'equalFields', 'phoneNumber', 'pattern',
+      requiredPermissions: string | Permissions, // Permissions required for this field to be visible
+      // specific form control options for various form control types
+      fieldOptions: &#123;
+          // input controls options
+          multiple: boolean,               // Used for autocomplete, select button and file upload control to allow multiple values
+          min: number,                     // Used for number input control to set minimum value
+          max: number,                     // Used for number input control to set maximum value
+          useGrouping: boolean,            // Used for number input control to set use grouping
+          minFractionDigits: number,       // Used for number input control to set minimum fraction digits
+          maxlength: number,               // Used for input control to set maximum length of input
+          keyFilter: string,               // Used for input control to set key filter to allow only certain characters
+          currency: string,                // Used for input control to set currency string (3 char code eg. 'USD' or 'EUR')
+          inputMask: string,               // Used for input control to set input mask (pattern eg. 999-999-99 alpha numeric combinations)
+          // date picker options
+          disabledDates: Date[],           // Used for datepicker control to set disabled dates
+          minDate: Date,                   // Used for datepicker control to set minimum date
+          maxDate: Date,                   // Used for datepicker control to set maximum date
+          // upload options
+          accept: string,                  // Used for file upload control to set accepted file types
+          maxFileSize: number,             // Used for file upload control to set maximum file size
+          auto: boolean,                   // Used for file upload control to set auto upload
+          mode: string,                    // Used for file upload control to set upload mode, 'basic' or 'advanced'
+          hiddenInputName: string,         // Used for file upload control to set hidden input name where file value will be stored for form control
+      &#125;
+      lookupEmpty: boolean,                // if form control value is empty select first item from dropdown options (default false, if field is required then its true)
+      // in case enum is used for dropdown options
+      lookupOptions: T[],                  // data for dropdown options
+      // in case lookup service is used for dropdown options
+      lookupModel: T,                      // model for lookup service
+      lookupService: T,                    // service to retrive data for dropdown options
+      cascadeTo: 'name',                   // form control name to which this field should be cascaded (used for cascading dropdowns);
+      cascadedBy: 'name',                  // form control name by which this field should be cascaded (used for cascading dropdowns);
+    </code>
+  </pre>
+  <h5>All properties of @PresentationEntity decorator</h5>
+  <pre>
+    <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      displayName: string,                 // table column header label
+      tableDisplay: boolean,               // is this field displayed in table (default is true if not defined)
+      disableSort: boolean,                // is this field sortable (default is false if not defined)
+      disableFilter: boolean,              // is this field filterable (default is false if not defined)
+      renderer: 'rendertype',              // simple html render for table cell, possible options are: 'yesNo', 'onOff', 'checkCross', 'emptyDash', 'dateTimeFormat', 'capitalizeFirst'
+      rendererValueRecord: boolean,        // define what is the type of value provided to renderer function, it can be row value (this property) or record, by default it's property value
+      useCustomComponent: boolean,         // is this field rendered with custom component
+      componentRenderType: 'rendertype',   // render type for custom component, possible options are: 'chips', 'file' ('chips' is used for list of strings, 'file' for image preview)
+      useCustomTemplate: boolean,          // used for columns with custom templates
+      quickViewDisplay: boolean,           // is this field displayed in quick view panel, default is true and can be omitted
+      quickViewPanelSectionDisplay: boolean, // is this field displayed in quick view panel audit section, default is false and can be omitted
+      columnWidthPercentage: number,       // factor used for configuring table column width
+      hidden: boolean,                     // is this field hidden, rendered but not visible in form (default is false)
+      requiredPermissions: string | Permissions, // permissions required for this field to be visible
+      enableRowActionsProperty: boolean,   // marks property as a flag used to determine if row actions for that entity should be enabled
+      // in case enum is used for dropdown options
+      enumModel: T,             // enum model for dropdown options that will be used in filtering
+      // in case lookup service is used for dropdown options
+      lookupModel: T,
+      lookupService: T,
+      suggestionSearch: boolean,           // property is being used for searching for autocomplete suggestions. More than one property can be used for searching. Used only for models that are defined as lookupModel with form type 'autocomplete'
+      criterionField: 'propname',          // property name for setting table filter control criterion field. Used only for complex entity relationships
+    </code>
+  </pre>
+  <h4>Service</h4>
+  <p>
+    When we create a new service, first <strong>extend AbstractModuleMetadataService</strong> and add everything to the
+    constructor as in the example below.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            export class CrmModuleMetadataService extends AbstractModuleMetadataService &#123;
+            private readonly errorLoadingService: ErrorLoadingService = inject(ErrorLoadingService);
+                constructor() &#123;
+                    super(ModuleMetadata.getInstance());
+                    this.errorLoadingService.loadValidationErrorsForModule(validationErrors);
+                &#125;
+            &#125;
+        </code>
+  </pre>
+  <h4>Form</h4>
+  <img class="img-full-width" ngSrc="assets/images/documentation/fiyu-form.png" alt="Image" width="1194" height="626" />
+  <p>
+    For forms use the <strong>AbstractFormComponent</strong> from the <strong>ui</strong> lib. In
+    <strong>newfeature-form.component.html</strong> add the code as shown in screenshot below.
+  </p>
+  <pre class="language-javascript">
+        <code class="language-html" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            &lt;fiyu-form&gt;
+            [formPurpose]="formPurpose"                          // Form component purpose, is for creating or editing, Default value is create
+            [formGroup]="form-group"                             // Main form group object
+            [formFields]="formFields"                            // Array of form fields objects
+            [formBlockTitles]="formBlockTitles"                  // Titles of form blocks
+            [showFormLoader]="showFormLoader"                    // default value is false
+            [loadingMessage]="loadingMessage"
+            [formSubmitClicked]="formSubmitClicked"              // default value is false
+            (formDiscarded)="onFormDiscard()"
+            (formSubmitted)="onFormSubmit()">
+            &lt;/fiyu-form&gt;
+        </code>
+    </pre>
+
+  <p>
+    In <strong>newfeature-form.component.ts</strong>, first <strong>extend AbstractFormComponent</strong> and add
+    everything to the constructor as in the example below. The only thing that should be changed is the
+    <strong>Model</strong> and <strong>Service</strong>.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            @Component(&#123;
+              selector: 'fiyu-newfeature-form',
+              templateUrl: './newfeature-form.component.html',
+              styleUrls: ['./newfeature-form.component.scss'],
+              standalone: true,
+              imports: [
+                FiyuFormComponent,
+              ],
+            &#125;)
+            export class FormComponent extends AbstractFormComponent&#60;NewFeatureModel&#62; &#123;
+                constructor(public override config: DynamicDialogConfig) &#123;
+                  super(
+                    NewFeatureModel,
+                    NewFeatureService,
+                    config
+                  );
+                &#125;
+            &#125;
+        </code>
+    </pre>
+  <h4>Data table</h4>
+  <img
+    class="img-full-width"
+    ngSrc="assets/images/documentation/data_table.webp"
+    alt="Image"
+    width="1137"
+    height="703"
+  />
+
+  <p>
+    When you want to create data table list, create a <strong>newfeature-list.component.ts</strong> file. First you need
+    to setup <strong>state config</strong>, second you should add <strong>providers</strong> like in the example below.
+    Setting <strong>persistState</strong> to <strong>true</strong> means that the current table state (sorting,
+    filtering and paging (page number, page size)) will be stored in localStorage.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+                export const TABLE_STATE_CONFIG: StateConfig = &#123;
+                    storeName: 'newFeatureStoreName',
+                    persistState: true,
+                &#125;;
+
+                @Component(&#123;
+                  selector: 'fiyu-newfeature-list',
+                  templateUrl: './newfeature-list.component.html',
+                  styleUrls: ['./newfeature-list.component.scss'],
+                  providers: [TableRepository, &#123; provide: STATE_CONFIG_TOKEN, useValue: TABLE_STATE_CONFIG &#125;],
+                  standalone: true,
+                  imports: [UpperCasePipe, RouterLink, ButtonModule, TranslateModule, TableComponent],
+                &#125;)
+                export class NewFeatureListComponent extends AbstractListViewComponent&#60;NewFeatureListItem&#62; &#123;
+                  private readonly destroyRef: DestroyRef = inject(DestroyRef);
+                    constructor() &#123;
+                      super(NewFeatureListItem, NewFeatureService);
+                    &#125;
+                &#125;
+        </code>
+  </pre>
+  <p>
+    Finally add <strong>fiyu-table</strong> component selector to the <strong>newfeature-list.component.html</strong> as
+    in the example below.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            &lt;div class="card"&gt;
+                &lt;fiyu-table
+                  [value]="tableItems"
+                  [configuration]="tableConfiguration"
+                  [totalResults]="totalResults"
+                  [tablePage]="tablePage"
+                  [customActionMenuItems]="customActionMenuItems"
+                  (dataLoaded)="loadData($event)"
+                  (rowEdit)="onEdit($event)"
+                  (rowDelete)="onDelete($event)"
+                &gt;
+                  &lt;ng-template fiyuTemplate="headerActions">
+                    &lt;button
+                      pButton
+                      pRipple
+                      type="button"
+                      [label]="sharedTranslateKeys.AddNew | translate | uppercase"
+                      [title]="sharedTranslateKeys.AddNew | translate | uppercase"
+                      [routerLink]="[headerProperties.createUrl]"
+                      [attr.data-cy]="'add'"
+                    &gt;&lt;/button&gt;
+                  &lt;/ng-template &gt;
+                &lt;/fiyu-table &gt;
+            &lt;/div&gt;
+        </code>
+  </pre>
+  <h4>Specific Table data</h4>
+  <img
+    class="img-full-width"
+    ngSrc="assets/images/documentation/specific_table_data.PNG"
+    alt="Image"
+    width="1574"
+    height="180"
+  />
+  <p>
+    For displaying data in table row we use <strong>@PresentationEntity</strong> decorator. We use
+    <strong>renderer</strong> and <strong>componentRenderType</strong> properties for rendering data that is not just
+    plain text. The <strong>componentRenderType</strong> property is used for rendering photos and chips. Types of
+    <strong>renderer</strong> in use throughout project are: <strong>'yesNo'</strong>,
+    <strong>'onOff'</strong>,<strong>'checkCross'</strong>, <strong>'emptyDash'</strong>,
+    <strong>'dateTimeFormat'</strong>.
+  </p>
+  <h5>ComponentRenderType</h5>
+  <p>
+    Rendering file: For rendering photo in table we use <strong>componentRenderType: 'file'</strong> in
+    <strong>@PresentationEntity</strong> decorator. <strong>TableFilePreviewComponent</strong> takes file uid and then
+    renders it to photo. Example of usage:
+  </p>
+  <pre>
+        <code fiyuPCode ngNonBindable ngPreserveWhitespaces>
+          @PresentationEntity(&#123;
+            useCustomComponent: true,
+            componentRenderType: 'file',
+            displayName: 'Photo',
+            disableFilter: true,
+            disableSort: true,
+          &#125;)
+        </code>
+      </pre>
+  <p>
+    Rendering chips: For rendering chips in table we use <strong>componentRenderType: 'chips'</strong> in
+    <strong>@PresentationEntity</strong> decorator.
+  </p>
+  <pre>
+    <code fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      @PresentationEntity(&#123;
+        displayName: _('common.organizations'),
+        disableFilter: true,
+        disableSort: true,
+        useCustomComponent: true,
+        componentRenderType: 'chips'
+      &#125;)
+    </code>
+  </pre>
+  <h4>Custom actions</h4>
+  <img
+    class="img-full-width"
+    ngSrc="assets/images/documentation/extra_actions.png"
+    alt="Image"
+    width="951"
+    height="478"
+  />
+
+  <p>
+    If you need to add <strong>custom actions</strong> on data table, you can do it very easily like in the example
+    below.
+  </p>
+  <pre>
+        <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+            this.customActionMenuItems = [
+                &#123;
+                    label: this.translateService.instant(this.sharedTranslateKeys.ExtraActions),
+                    items: [
+                      &#123;
+                        id: 'action-menu-item-install',
+                        title: this.translateService.instant(this.sharedTranslateKeys.Install),
+                        label: this.translateService.instant(this.sharedTranslateKeys.Install),
+                        icon: 'pi pi-cloud-download',
+                        visible: true,
+                        command: (event: MenuItemCommandEvent) => &#123;
+                          this.onInstall(event.item.state);
+                        &#125;,
+                      &#125;,
+                      &#123;
+                        id: 'action-menu-item-update',
+                        title: this.translateService.instant(this.sharedTranslateKeys.Update),
+                        label: this.translateService.instant(this.sharedTranslateKeys.Update),
+                        icon: 'pi pi-cloud-upload',
+                        visible: true,
+                        command: (event: MenuItemCommandEvent) => &#123;
+                          this.onUpdate(event.item.state);
+                        &#125;,
+                      &#125;,
+                    ],
+                &#125;,
+          ];
+        </code>
+    </pre>
+  <h4>Form Field Components</h4>
+  <p>When creating form we have our form field components.</p>
+  <h5>Autocomplete Form Component</h5>
+  <p>
+    Autocomplete Form Component is an input field that provides selectable suggestions as a user types into it. It
+    allows users to quickly search through and select from large collections of options.
+  </p>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/autocomplete_form_component.PNG"
+    width="360"
+    height="162"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      formType: FormControlType.Autocomplete,
+      groupNumber: 1,
+      label: SharedTranslateKeys.TechnicalAdministrator,
+      lookupModel: UserAdminListItem,
+      lookupService: UserService,
+      lookupSearchField: 'fullName',
+      placeholder:SharedTranslateKeys.ChooseResponsiblePerson,
+      required: true
+    &#125;)
+  </code>
+</pre>
+
+  <h5>Input Form Component</h5>
+  <p>Input Form Component is input field that allows user to enter strings.</p>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/input_form_component.PNG"
+    width="362"
+    height="112"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      formType: FormControlType.InputText,
+      groupNumber: 1,
+      label: SharedTranslateKeys.Name,
+      placeholder: SharedTranslateKeys.FullName,
+      required: true
+    &#125;)
+  </code>
+  </pre>
+
+  <h5>Input Number Form Component</h5>
+  <p>
+    Input Number Form Component is input field that allows user to enter only numbers, with or without decimals. Setting
+    minFractionDigits is controlling how many decimals user is allowed to enter.
+  </p>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/input_number_form_component.PNG"
+    width="373"
+    height="126"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      required: true,
+      label: SharedTranslateKeys.Price,
+      formType: FormControlType.InputNumber,
+      fieldOptions: &#123;
+        minFractionDigits: 3
+      &#125;
+    &#125;)
+  </code>
+</pre>
+
+  <h5>Input Switch Component</h5>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/input_switch_form_component.PNG"
+    width="352"
+    height="93"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      label: TranslateKeys.EnableNotifications,
+      formType: FormControlType.InputSwitch,
+    &#125;)
+  </code>
+</pre>
+
+  <h5>Input Mask Component</h5>
+  <p>
+    Input Mask Component is used for input fields that should have mask. Setting inputMask property in fieldOptions
+    object is for setting number of digits.
+  </p>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/input_mask_form_component.PNG"
+    width="385"
+    height="116"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      required: true,
+      label: SharedTranslateKeys.VerificationCode,
+      formType: FormControlType.InputMask,
+      fieldOptions:&#123;
+        inputMask:'9-9-9-9-9-9'
+      &#125;
+    &#125;)
+  </code>
+  </pre>
+
+  <h5>Checkbox Component</h5>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/checkbox_form_component.PNG"
+    width="362"
+    height="150"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      arrayValueType: String,
+      formType: FormControlType.Checkbox,
+      groupNumber: 2,
+      lookupModel: Role,
+      lookupService: RoleService,
+      renderLabel: false,
+      required: true
+    &#125;)
+  </code>
+</pre>
+
+  <h5>Currency Input Component</h5>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/currency_input_form_component.PNG"
+    width="386"
+    height="114"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      formType: FormControlType.InputCurrency,
+      required: true,
+      label: SharedTranslateKeys.Price
+    &#125;)
+  </code>
+</pre>
+
+  <h5>Rating Component</h5>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/rating_form_component.PNG"
+    width="217"
+    height="93"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      formType: FormControlType.InputRating,
+      label: TranslateKeys.Rating,
+      required: true,
+      initialValue: 0,
+    &#125;)
+    rating: number;
+  </code>
+</pre>
+
+  <h5>Dropdown Component</h5>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/dropdown_form_component.PNG"
+    width="390"
+    height="197"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      formType: FormControlType.Dropdown,
+      label: SharedTranslateKeys.PlanType,
+      required: true,
+      lookupEmpty: false,
+      lookupOptions: EnumUtility.mapEnumToSelectItems(PlanTypeEnum)
+    &#125;)
+  </code>
+</pre>
+
+  <h5>Date Component</h5>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/date_form_component.PNG"
+    width="414"
+    height="481"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      formType: FormControlType.Date,
+      label: SharedTranslateKeys.Birthdate,
+      required: true
+    &#125;)
+  </code>
+</pre>
+
+  <h5>Datetime Component</h5>
+  <p></p>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/datetime_form_component.PNG"
+    width="408"
+    height="488"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      formType: FormControlType.DateTime,
+      label: SharedTranslateKeys.EmploymentStartsFrom,
+      required: true
+    &#125;)
+  </code>
+</pre>
+  <h5>File Upload Component</h5>
+  <p>
+    For using Upload Component we should use two FormEntity decorators. In @FormEntity decorator where we defined
+    formType: FormControlType.Upload , we should override hiddenInputName to be in sync with property using @FormEntity
+    decorator with formType: FormControlType.InputFile. In our case hiddenInputName is 'id'.
+  </p>
+  <img
+    class="img-full-height"
+    ngSrc="assets/images/documentation/upload_form_component.PNG"
+    width="390"
+    height="101"
+    alt="Image"
+  />
+  <p>Example of usage:</p>
+  <pre>
+  <code class="language-typescript" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+    @FormEntity(&#123;
+      primary: true,
+      formType: FormControlType.InputFile,
+      renderLabel: false,
+      render: false,
+      hidden: true,
+      disabled:false,
+      required: false
+    &#125;)
+    id: string;
+
+    @FormEntity(&#123;
+      formType: FormControlType.Upload,
+      label: 'Upload file',
+      groupNumber: 1,
+      disabled: false,
+      required: false,
+      fieldOptions:&#123;
+        multiple: false,
+        maxFileSize: 20000000,
+        auto: true,
+        mode: 'basic',
+        hiddenInputName: 'id'
+      &#125;
+    &#125;)
+    photo: string;
+  </code>
+  </pre>
+</div>

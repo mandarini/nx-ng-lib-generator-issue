@@ -1,0 +1,117 @@
+<fiyu-feedback-bar />
+<div #loginContainer class="login-body">
+  <div class="login-wrapper">
+    <div class="login-panel">
+      <ng-container *ngIf="themeConfig$ | async as themeConfig">
+        <img
+          class="logo"
+          alt="login-logo"
+          width="427"
+          height="168"
+          priority
+          [ngSrc]="
+            '../../assets/images/logo/fiyu-' +
+            (themeConfig.colorScheme === colorScheme.Green ? 'white' : 'black') +
+            '.svg'
+          "
+        />
+      </ng-container>
+      <div>
+        <h2>{{ sharedTranslateKeys.LoginToYourAccount | translate }}</h2>
+        <form class="login-form" [formGroup]="form" (ngSubmit)="login()">
+          <ng-container *ngIf="!loading">
+            <div class="login-input-field">
+              <input
+                type="text"
+                formControlName="username"
+                pInputText
+                data-cy="username"
+                [placeholder]="sharedTranslateKeys.EnterUsername | translate"
+              />
+            </div>
+            <div class="login-input-field">
+              <p-password
+                styleClass="p-password p-component p-inputwrapper p-input-icon-right login-password-field"
+                autocomplete="new-password"
+                spellcheck="false"
+                [placeholder]="sharedTranslateKeys.EnterPassword | translate"
+                [inputId]="'password'"
+                [formControlName]="'password'"
+                [feedback]="false"
+                [toggleMask]="true"
+                [attr.data-cy]="'password'"
+              />
+            </div>
+            <div class="field-checkbox" style="width: 84%">
+              <p-checkbox
+                id="remember-me"
+                binary="true"
+                formControlName="rememberMe"
+                data-cy="remember-me"
+                ariaLabel="Remember credentials"
+                [label]="sharedTranslateKeys.RememberMe | translate"
+              />
+            </div>
+            <div *ngIf="errorMessage" class="error-message p-error">
+              {{ errorMessage }}
+            </div>
+            <button
+              type="submit"
+              pButton
+              aria-label="Log In"
+              role="button"
+              data-cy="login-submit"
+              [title]="sharedTranslateKeys.Login | translate"
+              [label]="sharedTranslateKeys.Login | translate"
+              (submit)="login()"
+            ></button>
+            <ng-container *ngIf="azureAuthEnabled">
+              <button
+                pButton
+                type="button"
+                class="mt-3"
+                role="button"
+                [label]="sharedTranslateKeys.LoginWithMicrosoftAccount | translate"
+                [title]="sharedTranslateKeys.LoginWithMicrosoftAccount | translate"
+                (click)="azureLogin()"
+              ></button>
+            </ng-container>
+            <div class="mt-3 mb-1">
+              <a class="mt-4" data-cy="forgot-password" [routerLink]="'/forgot-password'"
+                >{{ sharedTranslateKeys.ForgotPasswordTitle | translate }}?</a
+              >
+            </div>
+          </ng-container>
+        </form>
+      </div>
+
+      <div class="email-link">
+        <p>
+          <a href="mailto:info@fiyu.online?subject=Mail from Fiyu app"
+            ><svg viewBox="0 0 512 512" width="20" fill="#ffffff" title="envelope">
+              <path
+                d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"
+              /></svg
+            >{{ sharedTranslateKeys.EmailUs | translate }}</a
+          >
+          {{ sharedTranslateKeys.EmailUsForSupport | translate }}
+        </p>
+      </div>
+    </div>
+    <div class="login-image">
+      <div class="login-image-content">
+        <h1>{{ sharedTranslateKeys.AccessTo | translate }}</h1>
+        <h1>FIYU</h1>
+        <h1>{{ sharedTranslateKeys.AccountLogin | translate }}</h1>
+      </div>
+      <!--   <div class="image-footer">
+        <div class="icons">
+          <i class="pi pi-twitter"></i>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</div>
+<div *ngIf="loading" class="progress-spinner">
+  <p-progressSpinner />
+</div>

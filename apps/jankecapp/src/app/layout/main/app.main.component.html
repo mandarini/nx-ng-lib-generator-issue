@@ -1,0 +1,79 @@
+<fiyu-feedback-bar (actionToPerform)="openInstructionsDialog()" />
+<fiyu-feedback-toast />
+<fiyu-feedback-snackbar />
+<ng-container *ngIf="themeConfig$ | async as themeConfig">
+  <div
+    [ngClass]="{
+      'layout-overlay': themeConfig.menuMode === menuMode.Overlay,
+      'layout-static': themeConfig.menuMode === menuMode.Static,
+      'layout-slim': themeConfig.menuMode === menuMode.Slim,
+      'layout-horizontal': themeConfig.menuMode === menuMode.Horizontal,
+      'layout-sidebar-dim': themeConfig.colorScheme === colorScheme.Dim,
+      'layout-sidebar-dark': themeConfig.colorScheme === colorScheme.Dark,
+      'layout-overlay-active': overlayMenuActive,
+      'layout-mobile-active': staticMenuMobileActive,
+      'layout-static-inactive': staticMenuDesktopInactive && themeConfig.menuMode === menuMode.Static,
+      'p-input-filled': themeConfig.inputStyle === inputStyle.Filled,
+      'p-ripple-disabled': !ripple,
+      'layout-wrapper': true
+    }"
+    [class]="themeConfig.colorScheme === colorScheme.Light ? themeConfig.menuTheme : ''"
+    [attr.data-theme]="themeConfig.colorScheme"
+    [attr.aria-hidden]="true"
+    (click)="onLayoutClick()"
+    (keyup)="onLayoutClick()"
+  >
+    <div class="layout-content-wrapper">
+      <app-topbar />
+
+      <div class="layout-content">
+        <p-toast key="fiyuErrorKey" position="bottom-center" />
+        <p-toast key="fiyuKey" position="top-right" [style]="{ marginTop: '70px' }" />
+        <fiyu-confirm-dialog />
+        <router-outlet />
+      </div>
+
+      <app-footer />
+    </div>
+  </div>
+</ng-container>
+
+<fiyu-dialog
+  header="How to enable notifications"
+  width="80vw"
+  [displayDialog]="displayDialog"
+  [closable]="true"
+  [footer]="false"
+  [confirmDisabled]="false"
+  [draggable]="false"
+>
+  <ng-template fiyuTemplate="content">
+    <div class="row">
+      <p>
+        {{ sharedTranslateKeys.EnableNotificationsMessage | translate }}
+      </p>
+    </div>
+    <div class="row-align-center">
+      <img width="30" height="30" priority ngSrc="assets/images/notification_guide_1.png" alt="Guide 1" />
+    </div>
+    <div class="row-align-center">
+      <img width="30" height="30" priority ngSrc="assets/images/notification_guide_2.png" alt="Guide 2" />
+    </div>
+    <div class="row">
+      <p>
+        <i>{{ sharedTranslateKeys.EnableNotificationsNote | translate }}</i>
+      </p>
+    </div>
+    <div class="row-align-right">
+      <button
+        aria-label="Close instruction dialog"
+        type="button"
+        class="dialog-button"
+        pButton
+        [label]="sharedTranslateKeys.GotIt | translate"
+        [title]="sharedTranslateKeys.GotIt | translate"
+        (click)="hideInstructionsDialog()"
+      ></button>
+    </div>
+  </ng-template>
+</fiyu-dialog>

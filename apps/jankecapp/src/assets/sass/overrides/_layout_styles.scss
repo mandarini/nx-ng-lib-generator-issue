@@ -1,0 +1,44 @@
+/* Add your customizations of the layout styles here */
+
+.layout-topbar {
+  .topbar-menu {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    @include flex();
+    @include flex-align-center();
+
+    > li {
+      &.organization-item {
+        padding: 0 0 0 1rem;
+        border-left: 1px solid $dividerColor;
+
+        > a {
+          width: auto;
+          height: auto;
+          @include flex();
+          @include flex-align-center();
+          font-size: 0.875rem;
+          font-weight: 600;
+          padding: 0 0.5rem 0 0;
+        }
+      }
+
+      > ul {
+        &.organization-menu {
+          span {
+            margin-left: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+.layout-sidebar {
+  .logo-image {
+    vertical-align: middle;
+    margin-right: 0.5 rem;
+    width: 57%;
+  }
+}

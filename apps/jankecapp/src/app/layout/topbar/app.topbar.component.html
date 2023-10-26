@@ -1,0 +1,181 @@
+<div class="layout-topbar">
+  <div class="topbar-left">
+    <a tabindex="0" class="menu-button" (click)="appMain.onMenuButtonClick($event)">
+      <i class="pi pi-chevron-left"></i>
+    </a>
+    <img
+      id="logo-horizontal"
+      class="horizontal-logo"
+      alt="horizontal-logo"
+      width="427"
+      height="168"
+      [routerLink]="['/']"
+      [ngSrc]="'assets/images/logo/fiyu-black.svg'"
+    />
+    <span class="topbar-separator"></span>
+    <ng-template *ngFor="let item of items$ | async; let last = last; let i = index">
+      <span class="viewname">{{ item.label | translate }}</span>
+      <span *ngIf="!last"><i class="pi pi-angle-right"></i></span>
+    </ng-template>
+    <img
+      id="logo-mobile"
+      alt="logo-mobile"
+      class="mobile-logo"
+      width="427"
+      height="168"
+      [ngSrc]="'assets/images/logo/fiyu-black.svg'"
+    />
+  </div>
+
+  <app-menu />
+
+  <div class="layout-mask modal-in"></div>
+
+  <div *ngIf="userOrganizationsWithModules$ | async" class="topbar-right">
+    <ul class="topbar-menu">
+      <li
+        class="language-item"
+        [ngClass]="{
+          'active-menuitem fadeInDown': appMain.topbarOrganizationMenuActive
+        }"
+      >
+        <p-dropdown
+          [inputId]="'language-switcher'"
+          [formControl]="languageSwitcher"
+          [options]="languageOptions"
+          [autoDisplayFirst]="true"
+          [attr.data-cy]="'language-switcher'"
+          [ariaLabelledBy]="'Choose language'"
+          [ariaLabel]="'Choose language'"
+          [ariaFilterLabel]="'Search for language'"
+        >
+          <ng-template let-selected pTemplate="selectedItem">
+            <div class="country-item country-item-value">
+              <img
+                width="44"
+                height="30"
+                priority
+                alt="flag-selected"
+                ngSrc="assets/images/flag_placeholder.png"
+                [class]="'flag flag-' + selected.icon"
+              />
+              <div>{{ selected.label }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-option pTemplate="item">
+            <div class="country-item">
+              <img
+                alt="flag"
+                width="44"
+                height="30"
+                priority
+                ngSrc="assets/images/flag_placeholder.png"
+                [class]="'flag flag-' + option.icon"
+              />
+              <div>{{ option.label }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </li>
+      <li
+        class="organization-item"
+        [ngClass]="{
+          'active-menuitem fadeInDown': appMain.topbarOrganizationMenuActive
+        }"
+      >
+        <p-menubar [model]="tieredItems" />
+      </li>
+
+      <li
+        class="profile-item"
+        [ngClass]="{
+          'active-menuitem fadeInDown': appMain.topbarUserMenuActive
+        }"
+      >
+        <div class="profile-avatar-section" (click)="appMain.onTopbarUserMenuButtonClick($event)">
+          <ng-container *ngIf="profileImage$ | async as profileImage; else empty">
+            <p-avatar
+              styleClass="profile-image"
+              class="ml-2"
+              shape="circle"
+              size="small"
+              data-cy="profile-image"
+              [image]="profileImage.base64ImageString"
+            />
+          </ng-container>
+          <ng-template #empty>
+            <p-avatar
+              icon="pi pi-user"
+              styleClass="profile-image"
+              size="small"
+              shape="circle"
+              class="ml-2"
+              data-cy="profile-image"
+            />
+          </ng-template>
+          <span class="profile-name mr-2">{{ userFullName }}</span>
+        </div>
+        <ul class="profile-menu fade-in-up">
+          <li>
+            <a [routerLink]="['/user/profile-settings']">
+              <i class="pi pi-user"></i>
+              <span>{{ sharedTranslateKeys.Profile | translate }}</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="['/user/preferences']">
+              <i class="pi pi-cog"></i>
+              <span>{{ sharedTranslateKeys.Settings | translate }}</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="['/user/user-password']">
+              <i class="pi pi-key"></i>
+              <span>{{ sharedTranslateKeys.ChangePassword | translate }}</span>
+            </a>
+          </li>
+          <li>
+            <a class="cursor-pointer" (click)="logout()">
+              <i class="pi pi-power-off"></i>
+              <span>{{ sharedTranslateKeys.Logout | translate }}</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li
+        *hasPermissions="'NMM_RUN'; operation: 'OR'; moduleAlias: moduleAliases.NOTIFICATIONS"
+        #notifications
+        class="notifications-item"
+        [ngClass]="{ 'active-menuitem ': appMain.topbarNotificationMenuActive }"
+      >
+        <a href="#" tabindex="0" (click)="appMain.onTopbarNotificationMenuButtonClick($event)">
+          <i class="pi pi-bell" title="Open notifications" role="button" [attr.aria-labelledby]="'Notifications'"></i>
+          <span *ngIf="notificationMessagesUnseen > 0" class="topbar-badge">{{ notificationMessagesUnseen }}</span>
+        </a>
+        <ul class="notifications-menu fadeInDown notifications">
+          <li>
+            <div class="notifications-container" id="topbarnotification-container">
+              <div
+                *ngFor="let notification of notificationMessages"
+                [ngClass]="{
+                  notification: true,
+                  'notification-readed': notification?.read
+                }"
+              >
+                <i [ngClass]="notification?.icon" [ngStyle]="{ 'background-color': notification?.color }"></i>
+                <div class="notification-message">
+                  <span class="notification-detail" (click)="readNotification(notification?.id)">{{
+                    notification?.message
+                  }}</span>
+                </div>
+              </div>
+              <button type="button" pButton (click)="viewAllNotifications()">
+                {{ sharedTranslateKeys.ViewAll | translate }}
+              </button>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>

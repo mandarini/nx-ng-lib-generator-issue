@@ -1,0 +1,47 @@
+:host::ng-deep.language-item {
+  .p-dropdown {
+    width: 100px;
+  }
+}
+
+:host::ng-deep.organization-item .p-menubar {
+  // background: #fff !important;
+  border: none !important;
+}
+
+:host::ng-deep.organization-item .p-menubar-root-list {
+  width: auto !important;
+}
+
+:host::ng-deep.profile-item {
+  padding: 0 !important;
+}
+
+::ng-deep .p-menubar .p-submenu-list > .p-menuitem-active > p-menubarsub > .p-submenu-list {
+  display: inline-table !important;
+  right: 100% !important;
+  left: unset !important ;
+}
+
+.country-item {
+  display: flex;
+  align-items: center;
+}
+.country-item img.flag {
+  width: 18px;
+  margin-right: 0.5rem;
+}
+.profile-avatar-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (min-width: 960px) and (max-width: 1091px) {
+  ::ng-deep .p-menubar .p-submenu-list > .p-menuitem-active > p-menubarsub > .p-submenu-list {
+    display: inline-table !important;
+    left: 100% !important;
+    right: unset !important ;
+  }
+}

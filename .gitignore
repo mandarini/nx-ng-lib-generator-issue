@@ -1,0 +1,66 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+## compiled output
+/dist
+/tmp
+/out-tsc
+/apps/**/**/*.js
+/libs/**/*.js
+*.js.map
+*.model.js
+*.component.js
+*.component.spec.js
+
+# dependencies
+/node_modules
+/libs/**/node_modules
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+.angular
+/.sass-cache
+.dccache
+/connect.lock
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+.betterer.cache
+.betterer.results
+
+# testing
+/coverage/
+.nyc_output/out.json
+.nyc_output/
+cypress/screenshots
+cypress/videos
+reports
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# dotenv environment variables file
+.env
+.env.*
+.*.env
+cypress.env.json
+
+
+
+.nx/cache

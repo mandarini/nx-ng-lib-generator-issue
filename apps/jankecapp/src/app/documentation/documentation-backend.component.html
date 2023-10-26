@@ -1,0 +1,445 @@
+<div class="card">
+  <h1>Documentation</h1>
+  <h2>Metadata</h2>
+  <h4>Oauth2 Configuration</h4>
+  <p>
+    Fiyu uses OAuth2 for authentication. It provides ready defined configuration classes that can be imported in our
+    module to provide support for Oauth2.
+  </p>
+  <p>For our module to use those classes, we will add the fiyu-core dependency in our pom.xml.</p>
+  <pre>
+    <code class="language-xml" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      &lt;dependency&gt;
+        &lt;groupId&gt;app.fiyu&lt;/groupId&gt;
+        &lt;artifactId&gt;fiyu-core&lt;/artifactId&gt;
+      &lt;/dependency&gt;
+    </code>
+  </pre>
+  <p>
+    After adding the dependency use the <strong><em>@Import</em></strong> annotation with the class
+    <strong><em>OAuth2CoreResourceServerConfig.class</em></strong> like below.
+  </p>
+  <pre>
+    <code class="language-java" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      @SpringBootApplication
+      @Import(&#123;
+        OAuth2CoreResourceServerConfig.class
+      &#125;)
+      public class CrmApplication &#123;
+    </code>
+  </pre>
+  <p>
+    Next, we need to add the bean <strong><em>FiyuResourceUserAuthenticationConverter</em></strong>
+    used for converting FIYU JWT token into Authentication in resource modules in our main class.
+  </p>
+  <p>
+    The class <strong><em>FiyuResourceUserAuthenticationConverter</em></strong> is found in the
+    <strong><em>fiyu-commons</em></strong> dependency and therefore should be added in the pom.xml.
+  </p>
+  <pre>
+    <code class="language-xml" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      &lt;dependency&gt;
+        &lt;groupId&gt;app.fiyu&lt;/groupId&gt;
+        &lt;artifactId&gt;fiyu-commons&lt;/artifactId&gt;
+      &lt;/dependency&gt;
+    </code>
+  </pre>
+  <p>After adding the dependency, declare the class as a Bean.</p>
+  <pre>
+    <code class="language-java" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      @Bean
+      @Primary
+      public FiyuResourceUserAuthenticationConverter coreResourceUserAuthenticationConverter(@Value("$&#123;spring.module.alias  &#125;") final String moduleName) &#123;
+        return new CoreResourceUserAuthenticationConverter(moduleName);
+        &#125;
+    </code>
+  </pre>
+  <p>
+    By adding the above two classes, (OAuth2CoreResourceServerConfig, FiyuResourceUserAuthenticationConverter) we have
+    configured our module to use OAuth2.
+  </p>
+  <h3>Method Security</h3>
+  <p>
+    To enable method security for methods we add the class MethodSecurityConfig in the
+    <strong><em>@Import</em></strong> annotation.
+  </p>
+  <pre>
+    <code class="language-java" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      @SpringBootApplication
+      @Import(&#123;
+        OAuth2CoreResourceServerConfig.class,
+        MethodSecurityConfig.class
+      &#125;)
+      public class CrmApplication   &#123;  &#125;
+    </code>
+  </pre>
+  <h2>Model</h2>
+  <p>
+    Fiyu provides a couple of entity classes that can be extended from depending on what you are trying to achieve. The
+    classes can be found in the packages <strong><em>app.fiyu.commons.entity</em></strong> and
+    <strong><em>app.fiyu.entity</em></strong
+    >.
+  </p>
+  <p>
+    For our case, we are going to extend from the class ModificationAwareEntity which has columns related to
+    modification: id, created, createdBy, lastModification, lastModifiedBy.
+  </p>
+  <pre>
+    <code class="language-java" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      @Entity
+      @Table(name = "plan")
+      public class Plan extends ModificationAwareEntity   &#123;
+        @Column(name = "name")
+        private String name;
+
+        @Enumerated(EnumType.STRING)
+        @Column(name = "plan_type")
+        private PlanType planType;
+
+        @Column(name = "price")
+        private BigDecimal price;
+
+        @Column(name = "vat_percent")
+        private BigDecimal vatPercent;
+
+        @Column(name = "description")
+        private String description;
+
+        @Column(name = "alias")
+        private String alias;
+
+        @Column(name = "currency")
+        @Enumerated(EnumType.STRING)
+        private CurrencyType currency;
+
+        @Column(name = "organization_id")
+        private UUID organizationId;
+
+        // Getters and setters omitted for brevity.
+      &#125;
+    </code>
+  </pre>
+  <h3>Liquibase Setup</h3>
+  <p>
+    Fiyu uses <a href="https://www.liquibase.org">liquibase</a> for tracking and applying database schema changes. We
+    will use it to create a database table for our entity above.
+  </p>
+  <p>
+    For us to use it, we will need to add a property <strong><em> spring.liquibase.change-log</em></strong> in our
+    application.yml file. This propery configures liquibase's change log configuration path.
+  </p>
+  <p>In our case this will look like below.</p>
+  <pre>
+    <code class="language-xml" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      spring:
+        liquibase:
+          change-log: classpath:db/database-changelog-master.xml
+    </code>
+  </pre>
+  <p>
+    Next, we will need to create the file <em>database-changelog-master.xml</em>. To do this, create a folder called
+    <em>db</em> under the resources folder. Inside the <em>db</em> folder create a file called
+    <em>database-changelog-master</em> with the content below.
+  </p>
+  <pre>
+    <code class="language-xml" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      &lt;databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"&gt;
+
+      &lt;/databaseChangeLog&gt;
+    </code>
+  </pre>
+  <p>
+    To create a table for our <em>Plan</em> entity above, we will create a file plan.xml inside the db folder with the
+    below content.
+  </p>
+  <pre>
+    <code class="language-xml" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+        &lt;?xml version="1.1" encoding="UTF-8" standalone="no"?&gt;
+        &lt;databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd"&gt;
+
+          &lt;changeSet id="createTable-plan" author="admin"&gt;
+            &lt;createTable tableName="plan"&gt;
+              &lt;column name="id" type="UUID"&gt;
+                &lt;constraints primaryKey="true" primaryKeyName="pk_plan_id"/&gt;
+              &lt;/column&gt;
+              &lt;column name="name" type="VARCHAR(50)"&gt;
+                &lt;constraints nullable="false"/&gt;
+              &lt;/column&gt;
+              &lt;column name="alias" type="VARCHAR(50)" /&gt;
+              &lt;column name="description" type="VARCHAR(100)" /&gt;
+              &lt;column name="price" type="DECIMAL" /&gt;
+              &lt;column name="vat_percent" type="DECIMAL" /&gt;
+              &lt;column name="plan_type" type="VARCHAR(100)" /&gt;
+              &lt;column name="currency" type="VARCHAR(100)" /&gt;
+              &lt;column name="created" type="DATETIME"&gt;
+                &lt;constraints nullable="false"/&gt;
+              &lt;/column&gt;
+              &lt;column name="created_by" type="VARCHAR(100)"&gt;
+                &lt;constraints nullable="false"/&gt;
+              &lt;/column&gt;
+              &lt;column name="last_modification" type="DATETIME"/&gt;
+              &lt;column name="last_modified_by" type="VARCHAR(100)"/&gt;
+           &lt;/createTable&gt;
+          &lt;/changeSet&gt;
+        &lt;/databaseChangeLog&gt;
+    </code>
+  </pre>
+  <p>
+    We will then include the path to <em>plan.xml</em> inside the <em>database-changelog-master.xml</em> file so that
+    liquibase will create our table.
+  </p>
+  <p>After adding the path, the content of database-changelog-master.xml will look like below.</p>
+  <pre>
+    <code class="language-xml" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      &lt;databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"&gt;
+        &lt;include file="classpath:db/plan.xml"/&gt;
+      &lt;/databaseChangeLog&gt;
+    </code>
+  </pre>
+  <h2>DTO</h2>
+  <p>Our dto for the Plan entity will look like below.</p>
+  <pre>
+    <code class="language-java" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      public class PlanDto extends AbstractDto  &#123;
+        public static final String CONTENT_TYPE = "application/plan.v1+json";
+        public static final int NAME_MIN_SIZE = 1;
+        public static final int NAME_MAX_SIZE = 50;
+
+        @NotNull
+        @Size(min = NAME_MIN_SIZE, max = NAME_MAX_SIZE)
+        private String name;
+
+        @NotNull
+        private PlanType planType;
+
+        private BigDecimal price ;
+
+        private BigDecimal vatPercent;
+
+        private String description;
+
+        private CurrencyType currency;
+
+        // Getters and setters omitted for brevity.
+      &#125;
+
+    </code>
+  </pre>
+  <p>
+    We will use <a href="https://mapstruct.org/">MapStruct</a> that will help simplify the implementation of mappings
+    between <strong><em>PlanDto</em></strong> and <strong><em>Plan</em></strong> entity.
+  </p>
+  <p>To use MapStruct we will need to add its dependency in our pom.xml file.</p>
+  <pre>
+    <code class="language-xml" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      &lt;dependency&gt;
+        &lt;groupId&gt;org.mapstruct&lt;/groupId&gt;
+        &lt;artifactId&gt;mapstruct&lt;/artifactId&gt;
+        &lt;version&gt;$&#123;org.mapstruct.version&#125;&lt;/version&gt;
+      &lt;/dependency&gt;
+    </code>
+  </pre>
+  <p>Our Plan to PlanDto mapper will look like below.</p>
+  <pre>
+    <code class="language-java" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+      public interface PlanMapper &#123;
+          /**
+          * Method for mapping &#123;@link PlanDto&#125; into &#123;@link Plan&#125; object.
+          *
+          * @param planDto &#123;@link PlanDto&#125; object to be mapped into entity.
+          * @return &#123;@link Plan&#125; object.
+          */
+          Plan toEntity(PlanDto planDto);
+
+          /**
+          * Method for mapping &#123;@link Plan&#125; into &#123;@link PlanDto&#125; object.
+          *
+          * @param plan &#123;@link Plan&#125; object to be mapped into DTO.
+          * @return &#123;@link PlanDto&#125; object.
+          */
+          PlanDto toDto(Plan plan);
+
+          /**
+          * Method for updating &#123;@link Plan&#125;.
+          *
+          * @param source &#123;@link PlanDto&#125; object to be mapped.
+          * @param destination &#123;@link Plan&#125; object that will be updated.
+          */
+          void apply(PlanDto source, @MappingTarget Plan destination);
+
+          /**
+          * Method for mapping &#123;@link Plan&#125; into &#123;@link PlanListItemDto&#125; object.
+          *
+          * @param plan &#123;@link Plan&#125; object to be mapped into list item DTO.
+          * @return &#123;@link PlanListItemDto&#125; object.
+          */
+          @Mapping(target = "lastModified", source = "plan.lastModification")
+          PlanListItemDto toListItemDto(Plan plan);
+
+          /**
+          * Method for mapping &#123;@link Plan&#125; into &#123;@link PlanSelectItemDto&#125; object.
+          *
+          * @param plan &#123;@link Plan&#125; object to be mapped into select item DTO.
+          * @return &#123;@link PlanSelectItemDto&#125; object.
+          */
+          @Mapping(target = "label", source = "plan.name")
+          PlanSelectItemDto toSelectItemDto(Plan plan);
+      &#125;
+    </code>
+  </pre>
+  <h2>DAO</h2>
+  <p>
+    Fiyu provides an interface that defines CRUD methods in addition to search methods. The interface is called
+    <strong><em>EntityDao&lt;T&gt;</em></strong> found in the package <strong><em>app.fiyu.commons.dao</em></strong
+    >.
+  </p>
+  <p>
+    The interface has been implemented by the class <strong><em>JpaEntityDao&lt;T&gt;</em></strong> found in the package
+    <strong><em>app.fiyu.commons.dao</em></strong
+    >.
+  </p>
+  <h2>Service</h2>
+  <p>
+    Fiyu provides a Service class that supports CRUD and search functionalities: EntityService&lt;T&gt; and its
+    implementation EntityServiceImpl&lt;T&gt;.
+  </p>
+  <p>
+    The class is found in the package <strong><em>app.fiyu.commons.service</em></strong
+    >.
+  </p>
+  <p>
+    The service class <strong><em>EntityServiceImpl&lt;T&gt;</em></strong> injects a dao
+    <strong><em>EntityDao&lt;T&gt;</em></strong> found in the package <strong><em>app.fiyu.commons.dao</em></strong
+    >.
+  </p>
+  <p>
+    Therefore, to be able to use the service class we need to enable component scanning in the above two packages:
+    <strong><em>app.fiyu.commons.service</em></strong> and <strong><em>app.fiyu.commons.dao</em></strong
+    >.
+  </p>
+  <pre>
+    <code class="language-java" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      package app.fiyu.crm;
+
+      @SpringBootApplication
+      @Import(&#123;
+        OAuth2CoreResourceServerConfig.class,
+        MethodSecurityConfig.class
+      &#125;)
+      @ComponentScan(&#123;
+        "app.fiyu.commons.service",
+        "app.fiyu.commons.dao",
+        "app.fiyu.crm"
+      &#125;)
+      public class CrmApplication &#123;
+        // Body omitted for brevity.
+      &#125;
+    </code>
+  </pre>
+  <h2>Controller</h2>
+  <p>A sample controller for the Plan that makes use of the service class discussed above is found below.</p>
+  <pre>
+    <code class="language-java" fiyuPCode ngNonBindable ngPreserveWhitespaces>
+      package app.fiyu.crm.plan;
+
+      @RequiredArgsConstructor
+      @RestController
+      @RequestMapping(PlanController.BASE_URL)
+      public class PlanController &#123;
+        public static final String BASE_URL = "/plans";
+
+        private final EntityService&lt;Plan&gt; planService;
+        private final PlanMapper planMapper;
+
+        @PreAuthorize("hasAuthority(T(app.fiyu.crm.commons.security.Permission).CRM_PLAN_CREATE.toString())")
+        @PostMapping(consumes = PlanDto.CONTENT_TYPE, produces = PlanDto.CONTENT_TYPE)
+        public ResponseEntity&lt;PlanDto&gt; createPlan(@RequestBody @Valid final PlanDto planDto) &#123;
+          if (planDto.getId() != null) &#123;
+            throw FiyuErrorCode.createIdNotNull(planDto);
+          &#125;
+          Plan plan = planMapper.toEntity(planDto);
+          final PlanDto result = planMapper.toDto(planService.create(plan));
+          return ResponseEntity.created(
+                        ServletUriComponentsBuilder.fromCurrentRequest()
+                                .path("/&#123;id&#125;")
+                                .buildAndExpand(result.getId()).toUri())
+                .body(result);
+        &#125;
+
+        @PreAuthorize("hasAuthority(T(app.fiyu.crm.commons.security.Permission).CRM_PLAN_VIEW.toString())")
+        @GetMapping(path = "/&#123;id&#125;", produces = PlanDto.CONTENT_TYPE)
+        public ResponseEntity&lt;PlanDto&gt; getPlan(@PathVariable("id") final UUID id) &#123;
+          try &#123;
+            Plan plan = planService.getById(Plan.class, id);
+            return ResponseEntity.ok(planMapper.toDto(plan));
+          &#125; catch (IllegalArgumentException ex) &#123;
+            throw FiyuErrorCode.entityNotFound(Plan.class.getSimpleName(), id);
+          &#125;
+        &#125;
+
+        @PreAuthorize("hasAuthority(T(app.fiyu.crm.commons.security.Permission).CRM_PLAN_EDIT.toString())")
+        @PutMapping(consumes = PlanDto.CONTENT_TYPE, produces = PlanDto.CONTENT_TYPE)
+        public ResponseEntity&lt;PlanDto&gt; updatePlan(@RequestBody @Valid final PlanDto planDto) &#123;
+          if (planDto.getId() == null) &#123;
+            throw FiyuErrorCode.updateIdNull(planDto);
+          &#125;
+          try &#123;
+            Plan existingPlan = planService.getById(Plan.class, planDto.getId());
+            planMapper.apply(planDto, existingPlan);
+            planService.update(existingPlan);
+            return ResponseEntity.ok(planMapper.toDto(existingPlan));
+          &#125; catch (IllegalArgumentException ex) &#123;
+            throw FiyuErrorCode.entityNotFound(Plan.class.getSimpleName(), planDto.getId());
+          &#125;
+        &#125;
+
+        @PreAuthorize("hasAuthority(T(app.fiyu.crm.commons.security.Permission).CRM_PLAN_DELETE.toString())")
+        @DeleteMapping("/&#123;id&#125;")
+        public ResponseEntity&lt;Void&gt; deletePlan(@PathVariable("id") final UUID id) &#123;
+          try &#123;
+            Plan plan = planService.getById(Plan.class, id);
+            planService.delete(plan);
+            return ResponseEntity.noContent().build();
+          &#125; catch (IllegalArgumentException ex) &#123;
+            throw FiyuErrorCode.entityNotFound(Plan.class.getSimpleName(), id);
+          &#125;
+        &#125;
+
+        @PreAuthorize("hasAuthority(T(app.fiyu.crm.commons.security.Permission).CRM_PLAN_VIEW.toString())")
+        @PostMapping(path = "/list", consumes = SearchCriteria.CONTENT_TYPE, produces = PlanListItemDto.CONTENT_TYPE)
+        public ResponseEntity&lt;SearchResult&lt;PlanListItemDto&gt;&gt; getPlanItems(@RequestBody final SearchCriteria searchCriteria) &#123;
+          final SearchResult&lt;Plan&gt; searchResult = planService.get(Plan.class, searchCriteria);
+          return ResponseEntity.ok(SearchResult.convert(searchResult, planMapper::toListItemDto));
+        &#125;
+
+        @PreAuthorize("hasAuthority(T(app.fiyu.crm.commons.security.Permission).CRM_PLAN_VIEW.toString())")
+        @PostMapping(path = "/suggestions", consumes = SearchCriteria.CONTENT_TYPE, produces = PlanSelectItemDto.CONTENT_TYPE)
+        public ResponseEntity&lt;SearchResult&lt;PlanSelectItemDto&gt;&gt; getPlanSuggestions(@RequestBody final SearchCriteria searchCriteria) &#123;
+          final SearchResult&lt;Plan&gt; searchResult = planService.get(Plan.class, searchCriteria);
+          return ResponseEntity.ok(SearchResult.convert(searchResult, planMapper::toSelectItemDto));
+        &#125;
+      &#125;
+    </code>
+  </pre>
+  <h2>ControllerAdvice</h2>
+  <p>Fiyu has a defined controller advice class.</p>
+  <p>
+    The class is called <strong><em>RestExceptionsAdvice</em></strong> and is found in the package
+    <strong><em>app.fiyu.commons.rest</em></strong
+    >.
+  </p>
+  <p>The class adds custom error headers in the response that tell more about the error that occurred.</p>
+  <p>These custom error headers are error-alert, error-params, error-info and error-code.</p>
+  <p>
+    To use the class you can add the package <strong><em>package app.fiyu.commons.rest</em></strong> in the
+    @ComponentScan annotation.
+  </p>
+</div>

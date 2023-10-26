@@ -1,0 +1,53 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <p>&nbsp;</p>
+      <div class="flex justify-content-center">
+        <div class="mr-2 widget-feature-box">
+          <img width="427" height="168" priority alt="fiyu-logo" [ngSrc]="'assets/images/fiyu-logo.png'" />
+          <h2>{{ sharedTranslateKeys.WelcomeMessage | translate }}</h2>
+          <span>{{ sharedTranslateKeys.WelcomeIntroMessage | translate }}</span>
+        </div>
+      </div>
+      <p>&nbsp;</p>
+    </div>
+  </div>
+</div>
+
+<fiyu-dialog
+  header="Notifications on Fiyu application"
+  width="50vw"
+  height="30vh"
+  [displayDialog]="displayDialog()"
+  [closable]="true"
+  [confirmDisabled]="false"
+  [draggable]="false"
+  [footer]="false"
+  [acceptLabel]="sharedTranslateKeys.GrantPermission | translate"
+  (confirm)="requestPermission()"
+>
+  <ng-template fiyuTemplate="content">
+    <div class="row">
+      <p>
+        {{ sharedTranslateKeys.FiyuPushNotifications | translate }}
+        <br />
+        {{ sharedTranslateKeys.FiyuPushNotificationsNote | translate }}
+        <b>{{ sharedTranslateKeys.GrantPermission | translate }}</b>
+        {{ sharedTranslateKeys.FiyuPushNotificationsNoteButtonText | translate }},
+        {{ sharedTranslateKeys.FiyuPushNotificationsNoteMessage | translate }}
+        <b> {{ sharedTranslateKeys.Allow | translate }}</b>
+        {{ sharedTranslateKeys.FiyuPushNotificationsNoteMessageEnd | translate }}
+      </p>
+    </div>
+    <br />
+    <div class="row">
+      <button
+        type="button"
+        pButton
+        [label]="sharedTranslateKeys.GrantPermission | translate"
+        [title]="sharedTranslateKeys.GrantPermission | translate"
+        (click)="requestPermission()"
+      ></button>
+    </div>
+  </ng-template>
+</fiyu-dialog>

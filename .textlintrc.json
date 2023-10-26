@@ -1,0 +1,24 @@
+{
+  "filters": {},
+  "plugins": ["html", "latex", "latex2e"],
+  "rules": {
+    "editorconfig": true,
+    "no-todo": true,
+    "max-number-of-lines": true,
+    "max-comma": true,
+    "no-empty-section": true,
+    "period-in-list-item": true,
+    "alex": true,
+    "common-misspellings": true,
+    "write-good": true,
+    "ginger": true,
+    "apostrophe": true,
+    "stop-words": true,
+    "diacritics": true,
+    "sentence-length": true,
+    "@textlint-rule/no-unmatched-pair": true,
+    "@textlint-rule/no-invalid-control-character": true,
+    "@textlint-rule/proselint": true,
+    "en-capitalization": true
+  }
+}

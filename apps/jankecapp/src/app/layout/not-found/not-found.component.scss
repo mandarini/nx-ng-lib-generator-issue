@@ -1,0 +1,136 @@
+.section-error-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-image: url('../../../assets/images/page-not-found-background.webp');
+  overflow-x: hidden;
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+.inner-section-error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: center;
+  justify-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 100%;
+}
+
+.main-block {
+  align-items: stretch;
+  text-align: justify;
+  display: grid !important;
+  inline-size: 100%;
+  color: white;
+}
+
+.error-text-block {
+  justify-content: center;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(2.4rem, calc(0.8333333333vw + 2.1333333333rem), 3.2rem);
+}
+
+._404-error-block {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  padding: clamp(2.4rem, calc(0.8333333333vw + 2.1333333333rem), 3.2rem);
+}
+
+.text-block {
+  margin-top: clamp(2.4rem, calc(0.8333333333vw + 2.1333333333rem), 3.2rem);
+  text-align: left;
+  font-size: clamp(1.6rem, calc(0.2083333333vw + 1.5333333333rem), 1.8rem);
+}
+
+.ct-text-block {
+  font-weight: 900;
+  font-size: 26rem;
+}
+
+.outline--text-stroke {
+  color: rgba(0, 0, 0, 0);
+  -webkit-text-stroke: 1px white;
+}
+
+.link-text {
+  font-weight: 900;
+  color: #7cccb6;
+  font-size: clamp(1.6rem, 0.2083vw + 1.533rem, 1.8rem);
+}
+
+.error-text-block h1 {
+  text-align: left;
+}
+
+/* For Mobile View */
+@media screen and (min-width: 300px) {
+  .section-error-page {
+    background-position: 10% 0%;
+    h1 {
+      font-size: clamp(2.304rem, calc(0.93vw + 2rem), 3.19rem);
+    }
+  }
+
+  .inner-section-error-page {
+    padding: 0;
+  }
+
+  .main-block {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    display: grid !important;
+  }
+
+  .ct-text-block {
+    font-size: 13rem;
+    margin-top: 0;
+  }
+
+  ._404-error-block {
+    order: -1;
+  }
+
+  .error-text-block {
+    padding-top: 0;
+  }
+}
+
+/* For Tablet View */
+@media screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+  .section-error-page {
+    height: 100%;
+    width: 100%;
+    margin: auto !important;
+    background-size: cover;
+  }
+}
+
+/* For Desktop View */
+@media screen and (min-width: 1024px) {
+  .section-error-page {
+    position: relative;
+    background-position: left center;
+  }
+
+  .main-block {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  ._404-error-block {
+    order: 2;
+  }
+
+  .error-text-block {
+    padding: clamp(2.4rem, 0.83vw + 2.133rem, 3.2rem);
+  }
+}

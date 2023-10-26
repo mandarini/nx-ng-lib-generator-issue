@@ -1,0 +1,189 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schema://microtica/fiyu-jankecapp-fe.json",
+  "title": "FIYU Frontend Schema",
+  "type": "object",
+  "properties": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "PRODUCTION": {
+          "type": "string",
+          "description": "Indicates if the environment is production. Valid values are true and false",
+          "enum": ["true", "false"]
+        },
+        "SHOULD_ENCRYPT": {
+          "type": "string",
+          "description": "Indicates if encryption should be used. Valid values are true and false",
+          "enum": ["true", "false"]
+        },
+        "APP_HOST_URL": {
+          "type": "string",
+          "description": "The URL where this application will be served"
+        },
+        "PLATFORM_MODULE_API_URL": {
+          "type": "string",
+          "description": "BE endpoint for the platform service"
+        },
+        "USER_MODULE_API_URL": {
+          "type": "string",
+          "description": "BE endpoint for the user service"
+        },
+        "ORGANIZATION_MODULE_API_URL": {
+          "type": "string",
+          "description": "BE endpoint for the organization service"
+        },
+        "NMM_MODULE_API_URL": {
+          "type": "string",
+          "description": "BE endpoint for the notification service"
+        },
+        "DMM_MODULE_API_URL": {
+          "type": "string",
+          "description": "BE endpoint for the document service"
+        },
+        "CRM_MODULE_API_URL": {
+          "type": "string",
+          "description": "BE endpoint for the crm service"
+        },
+        "EMM_MODULE_API_URL": {
+          "type": "string",
+          "description": "BE endpoint for the email service"
+        },
+        "JANKEC_MODULE_API_URL": {
+          "type": "string",
+          "description": "BE endpoint for the JANKEC service"
+        },
+        "AZURE_AUTH_ENABLED": {
+          "description": "Azure auth feature flag. Valid values are true and false",
+          "type": "string"
+        },
+        "AZURE_AUTH_CLIENT_ID": {
+          "type": "string",
+          "description": "Azure auth client id"
+        },
+        "AZURE_AUTH_TENANT_ID": {
+          "type": "string",
+          "description": "Tenant ID (GUID) of the Azure Active Directory (Azure AD)"
+        },
+        "FIREBASE_API_KEY": {
+          "type": "string",
+          "description": "Firebase API key"
+        },
+        "FIREBASE_AUTH_DOMAIN": {
+          "type": "string",
+          "description": "Firebase auth domain"
+        },
+        "FIREBASE_DATABASE_URL": {
+          "type": "string",
+          "description": "Firebase database url"
+        },
+        "FIREBASE_PROJECT_ID": {
+          "type": "string",
+          "description": "Firebase project id"
+        },
+        "FIREBASE_STORAGE_BUCKET": {
+          "type": "string",
+          "description": "Firebase storage bucket"
+        },
+        "FIREBASE_MESSAGING_SENDER_ID": {
+          "type": "string",
+          "description": "Firebase messaging sender id"
+        },
+        "FIREBASE_APP_ID": {
+          "type": "string",
+          "description": "Firebase app id"
+        },
+        "FIREBASE_MEASUREMENT_ID": {
+          "type": "string",
+          "description": "Firebase measurement id"
+        },
+        "FIREBASE_VAPID_KEY": {
+          "type": "string",
+          "description": "Firebase vapid key"
+        },
+        "FIREBASE_RECAPTCHA_SITE_KEY": {
+          "type": "string",
+          "description": "Firebase app check recaptcha provider site key"
+        },
+        "FIREBASE_RECAPTCHA_SECRET_KEY": {
+          "type": "string",
+          "description": "Firebase app check recaptcha provider secret key"
+        },
+        "JWT_CLIENT_ID": {
+          "description": "Id used for Basic Auth in login purposes",
+          "type": "string"
+        },
+        "JWT_CLIENT_SECRET": {
+          "description": "Secret key used for Basic Auth in login purposes",
+          "type": "string"
+        },
+        "LOG_TO_LOKI": {
+          "type": "string",
+          "description": "Indicates if logging to Loki should be enabled. Valid values are true and false",
+          "enum": ["true", "false"]
+        },
+        "LOGSTASH_HOST_URL": {
+          "type": "string",
+          "description": "Logstash host url"
+        },
+        "LOKI_LOG_URL": {
+          "type": "string",
+          "description": "Loki log url"
+        },
+        "FE_INGRESS_HOST": {
+          "type": "string",
+          "description": "Frontend host entry for ingress, must be of format 'xyz.fiyu.online'"
+        },
+        "FE_INGRESS_HOST_2": {
+          "type": "string",
+          "description": "Second frontend host entry for ingress"
+        },
+        "INSTANCE_LIFECYCLE": {
+          "type": "string",
+          "description": "Required type of node during scheduling. Use 'on-demand' for production, 'spot' for other environments.",
+          "enum": ["on-demand", "spot"]
+        }
+      },
+      "required": [
+        "PRODUCTION",
+        "SHOULD_ENCRYPT",
+        "APP_HOST_URL",
+        "PLATFORM_MODULE_API_URL",
+        "USER_MODULE_API_URL",
+        "ORGANIZATION_MODULE_API_URL",
+        "NMM_MODULE_API_URL",
+        "DMM_MODULE_API_URL",
+        "CRM_MODULE_API_URL",
+        "EMM_MODULE_API_URL",
+        "JANKEC_MODULE_API_URL",
+        "AZURE_AUTH_ENABLED",
+        "AZURE_AUTH_CLIENT_ID",
+        "AZURE_AUTH_TENANT_ID",
+        "FIREBASE_API_KEY",
+        "FIREBASE_AUTH_DOMAIN",
+        "FIREBASE_DATABASE_URL",
+        "FIREBASE_PROJECT_ID",
+        "FIREBASE_STORAGE_BUCKET",
+        "FIREBASE_MESSAGING_SENDER_ID",
+        "FIREBASE_APP_ID",
+        "FIREBASE_MEASUREMENT_ID",
+        "FIREBASE_VAPID_KEY",
+        "FIREBASE_RECAPTCHA_SITE_KEY",
+        "FIREBASE_RECAPTCHA_SECRET_KEY",
+        "JWT_CLIENT_ID",
+        "JWT_CLIENT_SECRET",
+        "LOG_TO_LOKI",
+        "LOGSTASH_HOST_URL",
+        "LOKI_LOG_URL",
+        "FE_INGRESS_HOST",
+        "INSTANCE_LIFECYCLE"
+      ],
+      "additionalProperties": false
+    },
+    "outputs": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,5 @@
+# Ignore file:
+# ignored.md
+
+# Ignore by glob pattern:
+# vendor/**

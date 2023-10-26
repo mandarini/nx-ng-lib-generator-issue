@@ -1,0 +1,151 @@
+{
+  "name": "jankecapp",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "nas",
+  "sourceRoot": "apps/jankecapp/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/jankecapp",
+        "index": "apps/jankecapp/src/index.html",
+        "main": "apps/jankecapp/src/main.ts",
+        "polyfills": "apps/jankecapp/src/polyfills.ts",
+        "tsConfig": "apps/jankecapp/tsconfig.app.json",
+        "aot": true,
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/jankecapp/src/assets/",
+            "ignore": ["**/*.scss"],
+            "output": "./assets/"
+          },
+          "apps/jankecapp/src/firebase-messaging-sw.js",
+          "apps/jankecapp/src/assets/manifest.webmanifest",
+          "apps/jankecapp/src/assets/feature-flags.manifest.json"
+        ],
+        "styles": [
+          "apps/jankecapp/src/styles.scss",
+          "node_modules/cookieconsent/build/cookieconsent.min.css",
+          "node_modules/shepherd.js/dist/css/shepherd.css"
+        ],
+        "scripts": [
+          "node_modules/exceljs/dist/exceljs.min.js",
+          "node_modules/chart.js/dist/chart.umd.js",
+          "node_modules/prismjs/prism.js",
+          "node_modules/prismjs/components/prism-typescript.js",
+          "node_modules/cookieconsent/build/cookieconsent.min.js"
+        ],
+        "allowedCommonJsDependencies": [
+          "node-forge",
+          "file-saver",
+          "date-fns-tz",
+          "exceljs",
+          "jspdf-autotable",
+          "raf",
+          "rgbcolor",
+          "core-js"
+        ]
+      },
+      "configurations": {
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/jankecapp/src/environments/environment.ts",
+              "with": "apps/jankecapp/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false,
+          "buildOptimizer": true,
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "10mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "6kb",
+              "maximumError": "10kb"
+            }
+          ]
+        },
+        "dev": {
+          "fileReplacements": [
+            {
+              "replace": "apps/jankecapp/src/environments/environment.ts",
+              "with": "apps/jankecapp/src/environments/environment.dev.ts"
+            }
+          ],
+          "buildOptimizer": false,
+          "optimization": {
+            "fonts": false,
+            "scripts": false,
+            "styles": {
+              "minify": false,
+              "inlineCritical": false
+            }
+          },
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "dev"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "jankecapp:build:production"
+        },
+        "dev": {
+          "browserTarget": "jankecapp:build:dev"
+        }
+      },
+      "defaultConfiguration": "dev"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "jankecapp:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/jankecapp/**/*.ts", "apps/jankecapp/**/*.html"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/jankecapp/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "jankecapp:build"
+      }
+    }
+  }
+}

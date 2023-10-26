@@ -1,0 +1,64 @@
+<div class="layout-sidebar" (click)="appMain.onMenuClick()">
+  <a class="logo" [routerLink]="['/']">
+    <ng-container *ngIf="logo().base64ImageString; else fiyuLogo">
+      <img
+        priority
+        alt="FIYU - full code RAD platform"
+        id="app-logo"
+        class="logo-image"
+        width="320"
+        height="126"
+        [ngSrc]="logo().base64ImageString"
+      />
+    </ng-container>
+    <ng-template #fiyuLogo>
+      <img
+        id="app-logo"
+        class="logo-image"
+        ngSrc="assets/images/logo/fiyu-full-color.png"
+        width="320"
+        height="126"
+        priority
+        alt="FIYU - full code RAD platform"
+      />
+    </ng-template>
+  </a>
+  <div *ngIf="menuItems$ | async as menuItems" class="layout-menu-container">
+    <div class="layout-menu">
+      <ul class="row-align-center favorites" role="list">
+        <li *ngFor="let module of coreModules" class="favorites-icons" role="listitem">
+          <span
+            *hasPermissions="
+              getModulePermissions(module);
+              operation: operation;
+              moduleAlias: getModuleAlias(module?.moduleAlias)
+            "
+          >
+            <a role="link" [routerLink]="'/' + module.modulePrefix" (click)="goToModule()">
+              <i
+                class="mr-0 layout-menuitem-icon"
+                [ngClass]="module.moduleIcon"
+                [title]="module.moduleName | translate"
+              ></i>
+            </a>
+          </span>
+        </li>
+        <li class="menu-separator"></li>
+      </ul>
+      <ul *ngFor="let item of menuItems; let i = index; trackByProp: 'label'" role="list">
+        <ng-container>
+          <li
+            *ngIf="!item.separator"
+            app-menuitem
+            role="listitem"
+            [item]="item"
+            [index]="i"
+            [root]="true"
+            [id]="item.id"
+          ></li>
+          <li *ngIf="item.separator" class="menu-separator" role="listitem"></li>
+        </ng-container>
+      </ul>
+    </div>
+  </div>
+</div>
